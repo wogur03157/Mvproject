@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mever.api.domain.member.repository.MemberMapper">
+
+    <select id="getMemberList" resultType="MemberRes">
+        SELECT *
+        FROM member m
+        where category = #{category}
+--                  left join mail e on m.after_day=e.day;
+    </select>
+
+    <select id="getLotteryList" resultType="LotteryDto">
+        SELECT m.email, count(distinct m.email)+count(distinct r.email) as weight
+        FROM member m
+            LEFT JOIN reservation r ON m.email=r.email
+        WHERE m.category='/modelhouse1/'AND admin_yn='N'
+        GROUP BY m.email;
+    </select>
+
+</mapper>

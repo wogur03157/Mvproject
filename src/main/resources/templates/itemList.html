@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>상품 리스트</title>
+  <style>
+    .product {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .product img {
+      width: 100px;
+      height: 100px;
+      margin-right: 10px;
+    }
+
+    .product button {
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+<div id="productList"></div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+    // Ajax 요청을 보내고 상품 리스트 생성
+    $.ajax({
+      url: '/getItemContents', // 서버의 API 엔드포인트 또는 경로
+      method: 'GET',
+      success: function(response) {
+        // 받아온 상품 리스트로 HTML 생성
+        for (var i = 0; i < response.length; i++) {
+          var product = response[i];
+          var html = '<div class="product">';
+          html += '<img src="' + product.photoUrl + '" alt="상품 사진">';
+          html += '<h3>' + product.orderName + '</h3>';
+          html += '<p>가격: ' + 1000 + '원</p>';
+          html += '<button class="viewDetails" data-index="' + i + '">상세보기</button>';
+          html += '</div>';
+          $('#productList').append(html);
+        }
+      },
+      error: function(xhr, status, error) {
+        console.log(error);
+      }
+    });
+
+    // 상세보기 버튼 클릭 시 팝업 창 열기
+    $(document).on('click', '.viewDetails', function() {
+      var index = $(this).data('index');
+      $.ajax({
+        url: '/getItemContents', // 서버의 API 엔드포인트 또는 경로
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+          orderName: response[index].orderName,
+          category: response[index].category
+        }),
+        success: function(response) {
+          // 팝업 창에 Ajax 응답 객체 표시
+          var popupHtml = '<div>';
+          popupHtml += '<h2>' + response.orderName + '</h2>';
+          popupHtml += '<p>Order Name: ' + response.orderName + '</p>';
+          popupHtml += '<p>Contents: ' + response.contents + '</p>';
+          popupHtml += '</div>';
+          window.open('', 'popup', 'width=400,height=300');
+          var popupWindow = window.open('', 'popup', 'width=400,height=300');
+          popupWindow.document.write(popupHtml);
+        },
+        error: function(xhr, status, error) {
+          console.log(error);
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>

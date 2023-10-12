@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mever.api.domain.email.repository.EmailMapper">
+
+    <select id="getEmailList" resultType="ReservationEmailDto">
+            SELECT r.seq,
+                   r.email,
+                   r.title,
+                   r.content,
+                   r.period,
+                   r.update_at,
+                   r.create_date,
+                   r.send_date,
+                   m.after_day,
+                   a.title as mailtitle,
+                   a.content  as mailcontent
+            FROM reservation_mail r
+                         left join member m on m.email=r.email
+                         left join mail a on m.after_day = a.day
+            where DATE_FORMAT(r.send_date,'%Y-%m-%d')=DATE_FORMAT(NOW(),'%Y-%m-%d');
+    </select>
+
+</mapper>

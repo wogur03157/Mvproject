@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mever.api.domain.payment.repository.OrderMapper">
+
+    <select id="getPayList" resultType="PaymentResHandleDto">
+        SELECT
+                m_id,
+                o.email,
+                o.name,
+                m.phone,
+                version,
+                payment_key,
+                order_id,
+                order_name,
+                currency,
+                method,
+                total_amount,
+                balance_amount,
+                supplied_amount,
+                vat,
+                status,
+                requested_at,
+                approved_at,
+                use_escrow,
+                culture_expense,
+                type,
+                number,
+                company
+        FROM orders o
+            left join member m on m.email=o.email
+    </select>
+    <select id="getPartPayList" resultType="PaymentResHandleDto">
+        SELECT
+            m_id,
+            o.email,
+            o.name,
+            m.phone,
+            version,
+            payment_key,
+            order_id,
+            order_name,
+            currency,
+            method,
+            total_amount,
+            balance_amount,
+            supplied_amount,
+            vat,
+            status,
+            requested_at,
+            approved_at,
+            use_escrow,
+            culture_expense,
+            type,
+            number,
+            company
+        FROM orders o
+        INNER JOIN member m
+        on m.email=o.email
+        AND m.category = #{category}
+    </select>
+    <select id="getSubscriptionList" resultType="PaymentResHandleDto">
+        select  a.email
+             ,a.name
+             ,c.phone
+             ,a.order_name as orderName
+             ,concat(format(b.amount,0),'원') as currency
+             ,b.start_date as requestedAt
+             ,date(b.payment_date) as approvedAt
+             ,case
+                when b.period = 'day' then '일 결제'
+                when b.period = 'week' then '주 결제'
+                when b.period = 'month' then '월 결제'
+                when b.period = 'year' then '연 결제'
+                ELSE ''
+              end as period
+            ,b.status as status
+            ,b.billing_key
+        from 	market.orders a
+        inner
+        join 	market.subscription b
+        on 		a.billing_key = b.billing_key
+        and     a.type = 'BILLING'
+        inner
+        join	market.member c
+        on 		a.email = c.email
+        where   c.email = #{email}
+        and     c.phone = #{phone}
+    </select>
+</mapper>
